@@ -11,10 +11,4 @@
     <attr name="tsquare_displayAlwaysDigitNumbers" format="boolean"/>
     <attr name="tsquare_headerTextColor" format="color"/>
   </declare-styleable>
-
-  <declare-styleable name="calendar_cell">
-    <attr name="tsquare_state_selectable" format="boolean" />
-    <attr name="tsquare_state_current_month" format="boolean" />
-    <attr name="tsquare_state_today" format="boolean" />
-  </declare-styleable>
 </resources>

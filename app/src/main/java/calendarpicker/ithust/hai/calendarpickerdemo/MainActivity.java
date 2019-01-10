@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
         lastYear.add(Calendar.YEAR, -1);
 
         calendar = findViewById(R.id.calendar_view);
-        calendar.init(new Date(), nextYear.getTime()) //
+        calendar.init(new Date(), nextYear.getTime(), new Locale("vi")) //
                 .inMode(SelectionMode.SINGLE) //
                 .withSelectedDate(new Date());
 

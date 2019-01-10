@@ -10,18 +10,6 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 public class CalendarCellView extends FrameLayout {
-    private static final int[] STATE_SELECTABLE = {
-            R.attr.tsquare_state_selectable
-    };
-    private static final int[] STATE_CURRENT_MONTH = {
-            R.attr.tsquare_state_current_month
-    };
-    private static final int[] STATE_TODAY = {
-            R.attr.tsquare_state_today
-    };
-
-    private boolean isSelectable = false;
-    private boolean isCurrentMonth = false;
     private boolean isToday = false;
     private TextView dayOfMonthTextView;
 
@@ -29,24 +17,18 @@ public class CalendarCellView extends FrameLayout {
         super(context, attrs);
     }
 
-    public void setSelectable(boolean isSelectable) {
-        if (this.isSelectable != isSelectable) {
-            this.isSelectable = isSelectable;
-            refreshDrawableState();
-        }
-    }
-
-    public void setCurrentMonth(boolean isCurrentMonth) {
-        if (this.isCurrentMonth != isCurrentMonth) {
-            this.isCurrentMonth = isCurrentMonth;
-            refreshDrawableState();
-        }
-    }
-
     public void setToday(boolean isToday) {
         if (this.isToday != isToday) {
             this.isToday = isToday;
-            refreshDrawableState();
+            if (isToday) {
+                if (dayOfMonthTextView != null) {
+                    dayOfMonthTextView.setTypeface(null, Typeface.BOLD);
+                }
+            } else {
+                if (dayOfMonthTextView != null) {
+                    dayOfMonthTextView.setTypeface(null, Typeface.NORMAL);
+                }
+            }
         }
     }
 
@@ -75,44 +57,6 @@ public class CalendarCellView extends FrameLayout {
                 setBackgroundResource(R.drawable.calendar_date_picker_selected_right);
                 break;
         }
-    }
-
-    public boolean isCurrentMonth() {
-        return isCurrentMonth;
-    }
-
-    public boolean isToday() {
-        return isToday;
-    }
-
-    public boolean isSelectable() {
-        return isSelectable;
-    }
-
-    @Override
-    protected int[] onCreateDrawableState(int extraSpace) {
-        final int[] drawableState = super.onCreateDrawableState(extraSpace + 5);
-
-        if (isSelectable) {
-            mergeDrawableStates(drawableState, STATE_SELECTABLE);
-        }
-
-        if (isCurrentMonth) {
-            mergeDrawableStates(drawableState, STATE_CURRENT_MONTH);
-        }
-
-        if (isToday) {
-            mergeDrawableStates(drawableState, STATE_TODAY);
-            if (dayOfMonthTextView != null) {
-                dayOfMonthTextView.setTypeface(null, Typeface.BOLD);
-            }
-        } else {
-            if (dayOfMonthTextView != null) {
-                dayOfMonthTextView.setTypeface(null, Typeface.NORMAL);
-            }
-        }
-
-        return drawableState;
     }
 
     public void setDayOfMonthTextView(TextView textView) {

@@ -120,8 +120,6 @@ public class MonthView extends LinearLayout {
                         cellView.setSelected(cell.isSelected());
 
                         cellView.setRangeState(cell.getRangeState());
-                        cellView.setSelectable(cell.isSelectable());
-                        cellView.setCurrentMonth(true);
                         cellView.setToday(cell.isToday());
                         cellView.setTag(cell);
                     } else {
@@ -130,8 +128,6 @@ public class MonthView extends LinearLayout {
                         cellView.setSelected(false);
 
                         cellView.setRangeState(cell.getRangeState());
-                        cellView.setSelectable(false);
-                        cellView.setCurrentMonth(false);
                         cellView.setToday(false);
                         cellView.getDayOfMonthTextView().setText("");
                     }
