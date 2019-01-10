@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ithust.hai.calendarpicker.MonthView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <!-- This is the place where the month title is added -->
+
+    <LinearLayout
+        android:id="@+id/day_names_header_row"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingTop="@dimen/calendar_padding_day_name"
+        android:paddingBottom="@dimen/calendar_padding_day_name">
+
+        <TextView
+            style="@style/CalendarCell.DayHeader"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <TextView
+            style="@style/CalendarCell.DayHeader"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <TextView
+            style="@style/CalendarCell.DayHeader"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <TextView
+            style="@style/CalendarCell.DayHeader"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <TextView
+            style="@style/CalendarCell.DayHeader"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <TextView
+            style="@style/CalendarCell.DayHeader"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <TextView
+            style="@style/CalendarCell.DayHeader"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+    </LinearLayout>
+
+    <ithust.hai.calendarpicker.CalendarGridView
+        android:id="@+id/calendar_grid"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <include layout="@layout/calendar_view_week" />
+
+        <include layout="@layout/calendar_view_week" />
+
+        <include layout="@layout/calendar_view_week" />
+
+        <include layout="@layout/calendar_view_week" />
+
+        <include layout="@layout/calendar_view_week" />
+
+        <include layout="@layout/calendar_view_week" />
+    </ithust.hai.calendarpicker.CalendarGridView>
+</ithust.hai.calendarpicker.MonthView>

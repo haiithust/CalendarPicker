@@ -1,0 +1,28 @@
+<resources>
+
+    <style name="CalendarTitle">
+        <item name="android:textSize">@dimen/calendar_text_medium</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:gravity">center_horizontal</item>
+        <item name="android:textColor">@color/calendar_text_title</item>
+        <item name="android:paddingBottom">@dimen/calendar_month_title_bottommargin</item>
+        <item name="android:paddingTop">@dimen/calendar_month_topmargin</item>
+    </style>
+
+    <style name="CalendarCell">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="CalendarCell.DayHeader">
+        <item name="android:textColor">@color/calendar_text_day_name</item>
+        <item name="android:textSize">@dimen/calendar_text_small</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="CalendarCell.CalendarDate">
+        <item name="android:textSize">@dimen/calendar_text_small</item>
+        <item name="android:layout_width">match_parent</item>
+    </style>
+</resources>
