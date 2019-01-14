@@ -28,11 +28,11 @@ public class CalendarRowView extends ViewGroup implements View.OnClickListener {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         final int totalWidth = MeasureSpec.getSize(widthMeasureSpec);
         int cellSize = totalWidth / 7;
+        int cellTextWidth = MeasureSpec.makeMeasureSpec(cellSize, MeasureSpec.EXACTLY);
         for (int c = 0, numChildren = getChildCount(); c < numChildren; c++) {
             final View child = getChildAt(c);
             // Calculate width cells, making sure to cover totalWidth.
-            child.measure(MeasureSpec.makeMeasureSpec(cellSize, MeasureSpec.EXACTLY)
-                    , MeasureSpec.makeMeasureSpec(cellSize, MeasureSpec.AT_MOST));
+            child.measure(cellTextWidth, LayoutParams.WRAP_CONTENT);
         }
 
         setMeasuredDimension(cellSize, cellSize);
@@ -63,7 +63,7 @@ public class CalendarRowView extends ViewGroup implements View.OnClickListener {
         for (int i = 0; i < getChildCount(); i++) {
             if (getChildAt(i) instanceof CalendarCellView) {
                 CalendarCellView cell = ((CalendarCellView) getChildAt(i));
-                cell.removeAllViews();
+                //cell.removeAllViews();
                 adapter.makeCellView(cell);
             }
         }

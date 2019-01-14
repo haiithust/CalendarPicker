@@ -8,24 +8,21 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedHashSet;
-import java.util.Locale;
+import java.util.List;
 import java.util.Set;
 
 import ithust.hai.calendarpicker.CalendarPickerView;
 import ithust.hai.calendarpicker.DefaultDayViewAdapter;
 import ithust.hai.calendarpicker.SelectionMode;
 
-import static android.widget.Toast.LENGTH_SHORT;
-
 public class MainActivity extends AppCompatActivity {
-    private static final String TAG = "SampleTimesSquareActivi";
+    private static final String TAG = "MainActivity";
     private CalendarPickerView calendar;
     private AlertDialog theDialog;
     private CalendarPickerView dialogView;
@@ -43,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
         lastYear.add(Calendar.YEAR, -1);
 
         calendar = findViewById(R.id.calendar_view);
-        calendar.init(new Date(), nextYear.getTime(), new Locale("vi")) //
+        calendar.init(new Date(), nextYear.getTime()) //
                 .inMode(SelectionMode.SINGLE) //
                 .withSelectedDate(new Date());
 
@@ -53,18 +50,11 @@ public class MainActivity extends AppCompatActivity {
     private void initButtonListeners(final Calendar nextYear, final Calendar lastYear) {
         final Button single = findViewById(R.id.button_single);
         final Button multi = findViewById(R.id.button_multi);
-        final Button highlight = findViewById(R.id.button_highlight);
         final Button range = findViewById(R.id.button_range);
-        final Button displayOnly = findViewById(R.id.button_display_only);
         final Button dialog = findViewById(R.id.button_dialog);
-        final Button customized = findViewById(R.id.button_customized);
-        final Button decorator = findViewById(R.id.button_decorator);
-        final Button hebrew = findViewById(R.id.button_hebrew);
-        final Button arabic = findViewById(R.id.button_arabic);
-        final Button arabicDigits = findViewById(R.id.button_arabic_with_digits);
         final Button customView = findViewById(R.id.button_custom_view);
 
-        modeButtons.addAll(Arrays.asList(single, multi, range, displayOnly, decorator, customView));
+        modeButtons.addAll(Arrays.asList(single, multi, range, customView));
 
         single.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -96,20 +86,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        highlight.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                setButtonsEnabled(highlight);
-
-                Calendar c = Calendar.getInstance();
-                c.setTime(new Date());
-
-                calendar.setCustomDayView(new DefaultDayViewAdapter());
-                calendar.init(getDateWithYear(2000), getDateWithYear(2020))
-                        .inMode(SelectionMode.SINGLE).withSelectedDate(c.getTime());
-            }
-        });
-
         range.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -128,72 +104,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        displayOnly.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setButtonsEnabled(displayOnly);
-
-                calendar.setCustomDayView(new DefaultDayViewAdapter());
-                calendar.init(new Date(), nextYear.getTime()) //
-                        .inMode(SelectionMode.SINGLE) //
-                        .withSelectedDate(new Date()) //
-                        .displayOnly();
-            }
-        });
-
         dialog.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String title = "I'm a dialog!";
                 showCalendarInDialog(title, R.layout.dialog);
                 dialogView.init(lastYear.getTime(), nextYear.getTime()) //
-                        .withSelectedDate(new Date());
-            }
-        });
-
-        customized.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showCalendarInDialog("Pimp my calendar!", R.layout.dialog_customized);
-                dialogView.init(lastYear.getTime(), nextYear.getTime()).withSelectedDate(new Date());
-            }
-        });
-
-        decorator.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setButtonsEnabled(decorator);
-
-                calendar.setCustomDayView(new DefaultDayViewAdapter());
-                calendar.init(lastYear.getTime(), nextYear.getTime()) //
-                        .inMode(SelectionMode.SINGLE) //
-                        .withSelectedDate(new Date());
-            }
-        });
-
-        hebrew.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showCalendarInDialog("I'm Hebrew!", R.layout.dialog);
-                dialogView.init(lastYear.getTime(), nextYear.getTime(), new Locale("iw", "IL")) //
-                        .withSelectedDate(new Date());
-            }
-        });
-
-        arabic.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showCalendarInDialog("I'm Arabic!", R.layout.dialog);
-                dialogView.init(lastYear.getTime(), nextYear.getTime(), new Locale("ar", "EG")) //
-                        .withSelectedDate(new Date());
-            }
-        });
-
-        arabicDigits.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showCalendarInDialog("I'm Arabic with Digits!", R.layout.dialog_digits);
-                dialogView.init(lastYear.getTime(), nextYear.getTime(), new Locale("ar", "EG")) //
                         .withSelectedDate(new Date());
             }
         });
@@ -213,9 +129,10 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.done_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d(TAG, "Selected time in millis: " + calendar.getSelectedDate().getTime());
-                String toast = "Selected: " + calendar.getSelectedDate().getTime();
-                Toast.makeText(MainActivity.this, toast, LENGTH_SHORT).show();
+                List<Date> getSelectedDates = calendar.getSelectedDates();
+                for (Date date : getSelectedDates) {
+                    Log.d("DuyNgao", date.toString());
+                }
             }
         });
     }

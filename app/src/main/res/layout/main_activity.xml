@@ -29,58 +29,16 @@
                 android:text="@string/Multi" />
 
             <Button
-                android:id="@+id/button_highlight"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/Highlight" />
-
-            <Button
                 android:id="@+id/button_range"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/Range" />
 
             <Button
-                android:id="@+id/button_display_only"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/DisplayOnly" />
-
-            <Button
                 android:id="@+id/button_dialog"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/Dialog" />
-
-            <Button
-                android:id="@+id/button_customized"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/Customized" />
-
-            <Button
-                android:id="@+id/button_decorator"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/Decorator" />
-
-            <Button
-                android:id="@+id/button_hebrew"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/Hebrew" />
-
-            <Button
-                android:id="@+id/button_arabic"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/Arabic" />
-
-            <Button
-                android:id="@+id/button_arabic_with_digits"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/ArabicDigits" />
 
             <Button
                 android:id="@+id/button_custom_view"

@@ -641,14 +641,16 @@ public class CalendarPickerView extends RecyclerView {
 
                 weekCells.add(new MonthCellDescriptor(cal.getTimeInMillis(), isCurrentMonth, isSelectable, isSelected, isToday, isCurrentMonth ? cal.get(DAY_OF_MONTH) : 0, rangeState));
                 if (isCurrentMonth && selectionMode != SelectionMode.MULTIPLE) {
-                    if (cal.get(DAY_OF_MONTH) == cal.getActualMaximum(DAY_OF_MONTH) && (rangeState == RangeState.FIRST || rangeState == RangeState.MIDDLE)) {
+                    if (cal.get(DAY_OF_MONTH) == cal.getActualMaximum(DAY_OF_MONTH) && (rangeState == RangeState.FIRST
+                            || rangeState == RangeState.MIDDLE || rangeState == RangeState.START_WEEK)) {
                         // if first day of month is last selected day, should mark all next item
                         for (c = c + 1; c < 7; c++) {
                             weekCells.add(new MonthCellDescriptor(cal.getTimeInMillis(), false, false, false, isToday, 0, c == 6 ? RangeState.END_WEEK : RangeState.MIDDLE));
                             cal.add(DATE, 1);
                         }
                         break;
-                    } else if (cal.get(DAY_OF_MONTH) == cal.getActualMinimum(DAY_OF_MONTH) && (rangeState == RangeState.LAST || rangeState == RangeState.MIDDLE)) {
+                    } else if (cal.get(DAY_OF_MONTH) == cal.getActualMinimum(DAY_OF_MONTH) && (rangeState == RangeState.LAST
+                            || rangeState == RangeState.MIDDLE || rangeState == RangeState.END_WEEK)) {
                         // if last day selected is start of month should mark range state for previous item
                         for (int i = 0; i < c; i++) {
                             weekCells.get(i).setRangeState(i == 0 ? RangeState.START_WEEK : RangeState.MIDDLE);
