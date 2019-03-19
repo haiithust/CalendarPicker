@@ -54,27 +54,18 @@ public class CalendarGridView extends ViewGroup {
         }
         long start = System.currentTimeMillis();
         oldWidthMeasureSize = widthMeasureSize;
-        int cellSize = widthMeasureSize / 7;
-        // Remove any extra pixels since /7 is unlikely to give whole nums.
-        widthMeasureSize = cellSize * 7;
         int totalHeight = 0;
         final int rowWidthSpec = makeMeasureSpec(widthMeasureSize, EXACTLY);
         // Most cells are gonna be cellSize tall, but we want to allow custom cells to be taller.
         final int rowHeightSpec = makeMeasureSpec(widthMeasureSize, AT_MOST);
         for (int c = 0, numChildren = getChildCount(); c < numChildren; c++) {
-            final View child = getChildAt(c);
-            child.setMinimumHeight(cellSize);
+            View child = getChildAt(c);
             if (child.getVisibility() == View.VISIBLE) {
-                if (c == 0) { // It's the header: height should be wrap_content.
-                    measureChild(child, rowWidthSpec, makeMeasureSpec(cellSize, AT_MOST));
-                } else {
-                    measureChild(child, rowWidthSpec, rowHeightSpec);
-                }
+                measureChild(child, rowWidthSpec, rowHeightSpec);
                 totalHeight += child.getMeasuredHeight();
             }
         }
-        final int measuredWidth = widthMeasureSize + 2; // Fudge factor to make the borders show up.
-        setMeasuredDimension(measuredWidth, totalHeight);
+        setMeasuredDimension(widthMeasureSize, totalHeight);
         Logr.d("Grid.onMeasure %d ms", System.currentTimeMillis() - start);
     }
 
@@ -82,10 +73,12 @@ public class CalendarGridView extends ViewGroup {
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         long start = System.currentTimeMillis();
         top = 0;
+        int rowHeight = 0;
         for (int c = 0, numChildren = getChildCount(); c < numChildren; c++) {
-            final View child = getChildAt(c);
-            final int rowHeight = child.getMeasuredHeight();
-            child.layout(left, top, right, top + rowHeight);
+            if (rowHeight == 0) {
+                rowHeight = getChildAt(c).getMeasuredHeight();
+            }
+            getChildAt(c).layout(left, top, right, top + rowHeight);
             top += rowHeight;
         }
         Logr.d("Grid.onLayout %d ms", System.currentTimeMillis() - start);

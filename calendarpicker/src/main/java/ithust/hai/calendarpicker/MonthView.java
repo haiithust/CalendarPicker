@@ -20,7 +20,6 @@ public class MonthView extends LinearLayout {
     private TextView title;
     private CalendarGridView grid;
     private Listener listener;
-    private boolean isRtl;
     private Locale locale;
     private boolean alwaysDigitNumbers;
 
@@ -42,11 +41,6 @@ public class MonthView extends LinearLayout {
         view.setDayViewAdapter(adapter);
         view.setDayTextColor(dayTextColorResId);
 
-        if (dayBackgroundResId != 0) {
-            view.setDayBackground(dayBackgroundResId);
-        }
-
-        view.isRtl = isRtl(locale);
         view.locale = locale;
         view.alwaysDigitNumbers = showAlwaysDigitNumbers;
         int firstDayOfWeek = today.getFirstDayOfWeek();
@@ -54,7 +48,7 @@ public class MonthView extends LinearLayout {
         if (displayDayNamesHeaderRowView) {
             final int originalDayOfWeek = today.get(Calendar.DAY_OF_WEEK);
             for (int offset = 0; offset < 7; offset++) {
-                today.set(Calendar.DAY_OF_WEEK, getDayOfWeek(firstDayOfWeek, offset, view.isRtl));
+                today.set(Calendar.DAY_OF_WEEK, firstDayOfWeek + offset);
                 final TextView textView = (TextView) dayNamesHeaderRowView.getChildAt(offset);
                 textView.setText(weekdayNameFormat.format(today.getTime()));
             }
@@ -65,21 +59,6 @@ public class MonthView extends LinearLayout {
 
         view.listener = listener;
         return view;
-    }
-
-    private static int getDayOfWeek(int firstDayOfWeek, int offset, boolean isRtl) {
-        int dayOfWeek = firstDayOfWeek + offset;
-        if (isRtl) {
-            return 8 - dayOfWeek;
-        }
-        return dayOfWeek;
-    }
-
-    private static boolean isRtl(Locale locale) {
-        // TODO convert the build to gradle and use getLayoutDirection instead of this (on 17+)?
-        final int directionality = Character.getDirectionality(locale.getDisplayName(locale).charAt(0));
-        return directionality == Character.DIRECTIONALITY_RIGHT_TO_LEFT
-                || directionality == Character.DIRECTIONALITY_RIGHT_TO_LEFT_ARABIC;
     }
 
     public MonthView(Context context, AttributeSet attrs) {
@@ -107,7 +86,7 @@ public class MonthView extends LinearLayout {
                 weekRow.setVisibility(VISIBLE);
                 List<MonthCellDescriptor> week = cells.get(i);
                 for (int c = 0; c < week.size(); c++) {
-                    MonthCellDescriptor cell = week.get(isRtl ? 6 - c : c);
+                    MonthCellDescriptor cell = week.get(c);
                     CalendarCellView cellView = (CalendarCellView) weekRow.getChildAt(c);
                     if (cell.isCurrentMonth()) {
                         String cellDate = numberFormatter.format(cell.getValue());

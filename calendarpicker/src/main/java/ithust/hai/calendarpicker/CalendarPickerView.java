@@ -91,6 +91,7 @@ public class CalendarPickerView extends RecyclerView {
         a.recycle();
 
         setLayoutManager(new LinearLayoutManager(getContext()));
+        setHasFixedSize(true);
         adapter = new MonthAdapter();
         setBackgroundColor(bg);
         locale = Locale.getDefault();
