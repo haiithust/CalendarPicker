@@ -13,7 +13,6 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import java.text.DateFormat;
 import java.text.DateFormatSymbols;
@@ -40,7 +39,6 @@ import static java.util.Calendar.YEAR;
  * Android component to allow picking a date from a calendar view (a list of months).  Must be
  * initialized after inflation with {@link #init(Date, Date)} and can be customized with any of the
  * {@link FluentInitializer} methods returned.  The currently selected date can be retrieved with
- * {@link #getSelectedDate()}.
  */
 public class CalendarPickerView extends RecyclerView {
     private final CalendarPickerView.MonthAdapter adapter;
@@ -64,8 +62,7 @@ public class CalendarPickerView extends RecyclerView {
 
     private OnDateSelectedListener dateListener;
     private DateSelectableFilter dateConfiguredListener;
-    private OnInvalidDateSelectedListener invalidDateListener =
-            new DefaultOnInvalidDateSelectedListener();
+    private OnInvalidDateSelectedListener invalidDateListener;
     private CellClickInterceptor cellClickInterceptor;
     private DayViewAdapter dayViewAdapter = new DefaultDayViewAdapter();
 
@@ -112,19 +109,7 @@ public class CalendarPickerView extends RecyclerView {
         }
     }
 
-    public FluentInitializer init(Date minDate, Date maxDate, Locale locale) {
-        if (minDate == null || maxDate == null) {
-            throw new IllegalArgumentException(
-                    "minDate and maxDate must be non-null.  " + dbg(minDate, maxDate));
-        }
-        if (minDate.after(maxDate)) {
-            throw new IllegalArgumentException(
-                    "minDate must be before maxDate.  " + dbg(minDate, maxDate));
-        }
-        if (locale == null) {
-            throw new IllegalArgumentException("Locale is null.");
-        }
-
+    public FluentInitializer init(@NonNull Date minDate, @NonNull Date maxDate, @NonNull Locale locale) {
         // Make sure that all calendar instances use the same time zone and locale.
         this.locale = locale;
         today = Calendar.getInstance(locale);
@@ -162,7 +147,6 @@ public class CalendarPickerView extends RecyclerView {
             monthCounter.add(MONTH, 1);
         }
 
-        validateAndUpdate();
         return new FluentInitializer();
     }
 
@@ -176,7 +160,6 @@ public class CalendarPickerView extends RecyclerView {
          */
         public FluentInitializer inMode(byte mode) {
             selectionMode = mode;
-            validateAndUpdate();
             return this;
         }
 
@@ -206,8 +189,6 @@ public class CalendarPickerView extends RecyclerView {
                 }
             }
             scrollToSelectedDates();
-
-            validateAndUpdate();
             return this;
         }
 
@@ -224,6 +205,21 @@ public class CalendarPickerView extends RecyclerView {
             displayOnly = true;
             return this;
         }
+
+        public void show() {
+            validateAndUpdate();
+        }
+    }
+
+    public void newSelectedDate(Collection<Date> selectedDates) {
+        clearOldSelections();
+        if (selectedDates != null) {
+            for (Date date : selectedDates) {
+                selectDate(date);
+            }
+        }
+        validateAndUpdate();
+        scrollToSelectedDates();
     }
 
     private void validateAndUpdate() {
@@ -233,73 +229,30 @@ public class CalendarPickerView extends RecyclerView {
         adapter.notifyDataSetChanged();
     }
 
-    private void scrollToSelectedMonth(final int selectedIndex) {
-        scrollToSelectedMonth(selectedIndex, false);
-    }
-
-    private void scrollToSelectedMonth(final int selectedIndex, final boolean smoothScroll) {
-        post(new Runnable() {
-            @Override
-            public void run() {
-                Logr.d("Scrolling to position %d", selectedIndex);
-
-                if (smoothScroll) {
-                    smoothScrollToPosition(selectedIndex);
-                } else {
-                    scrollToPosition(selectedIndex);
-                }
-            }
-        });
+    private void scrollToSelectedMonth(int selectedIndex) {
+        scrollToPosition(selectedIndex);
     }
 
     private void scrollToSelectedDates() {
         int selectedIndex = NO_POSITION;
-        int todayIndex = NO_POSITION;
-        Calendar today = Calendar.getInstance(locale);
-        MonthDescriptor month;
+        Calendar cal = minDate(selectedCals);
+        if (cal == null) {
+            cal = Calendar.getInstance(locale);
+        }
+
         for (int c = 0; c < totalMonth; c++) {
             monthCounter.setTime(minCal.getTime());
             monthCounter.add(MONTH, c);
-            month = new MonthDescriptor(monthCounter.get(MONTH), monthCounter.get(YEAR), monthNameFormat.format(monthCounter.getTime()));
-            if (selectedIndex == NO_POSITION) {
-                for (Calendar selectedCal : selectedCals) {
-                    if (sameMonth(selectedCal, month)) {
-                        selectedIndex = c;
-                        break;
-                    }
-                }
-                if (selectedIndex == NO_POSITION && todayIndex == NO_POSITION && sameMonth(today, month)) {
-                    todayIndex = c;
-                }
-            }
-        }
-        if (selectedIndex != NO_POSITION) {
-            scrollToSelectedMonth(selectedIndex);
-        } else if (todayIndex != NO_POSITION) {
-            scrollToSelectedMonth(todayIndex);
-        }
-    }
 
-    public boolean scrollToDate(Date date) {
-        Integer selectedIndex = null;
-
-        Calendar cal = Calendar.getInstance(locale);
-        cal.setTime(date);
-        MonthDescriptor month;
-        for (int c = 0; c < totalMonth; c++) {
-            monthCounter.setTime(minCal.getTime());
-            monthCounter.add(MONTH, c);
-            month = new MonthDescriptor(monthCounter.get(MONTH), monthCounter.get(YEAR), monthNameFormat.format(monthCounter.getTime()));
-            if (sameMonth(cal, month)) {
+            if (sameMonth(cal, monthCounter)) {
                 selectedIndex = c;
                 break;
             }
         }
-        if (selectedIndex != null) {
+
+        if (selectedIndex != NO_POSITION) {
             scrollToSelectedMonth(selectedIndex);
-            return true;
         }
-        return false;
     }
 
     public void fixDialogDimens() {
@@ -329,14 +282,6 @@ public class CalendarPickerView extends RecyclerView {
         requestLayout();
     }
 
-    public Date getSelectedDate() {
-        return (selectedCals.size() > 0 ? selectedCals.get(0).getTime() : null);
-    }
-
-    /**
-     * Note that if mode is {@link SelectionMode#RANGE} selected date is start end end
-     * So you should hanle to get all selected by its
-     */
     public List<Date> getSelectedDates() {
         List<Date> selectedDates = new ArrayList<>();
         for (Calendar cal : selectedCals) {
@@ -347,16 +292,6 @@ public class CalendarPickerView extends RecyclerView {
         return selectedDates;
     }
 
-    /**
-     * Returns a string summarizing what the client sent us for init() params.
-     */
-    private static String dbg(Date minDate, Date maxDate) {
-        return "minDate: " + minDate + "\nmaxDate: " + maxDate;
-    }
-
-    /**
-     * Clears out the hours/minutes/seconds/millis of a Calendar.
-     */
     static void setMidnight(Calendar cal) {
         cal.set(HOUR_OF_DAY, 0);
         cal.set(MINUTE, 0);
@@ -377,7 +312,7 @@ public class CalendarPickerView extends RecyclerView {
                     invalidDateListener.onInvalidDateSelected(clickedDate);
                 }
             } else {
-                boolean wasSelected = doSelectDate(clickedDate, cell);
+                boolean wasSelected = doSelectDate(clickedDate, true);
 
                 if (dateListener != null) {
                     if (wasSelected) {
@@ -390,59 +325,18 @@ public class CalendarPickerView extends RecyclerView {
         }
     }
 
-    /**
-     * Select a new date.  Respects the {@link SelectionMode} this CalendarPickerView is configured
-     * with: if you are in {@link SelectionMode#SINGLE}, the previously selected date will be
-     * un-selected.  In {@link SelectionMode#MULTIPLE}, the new date will be added to the list of
-     * selected dates.
-     * <p>
-     * If the selection was made (selectable date, in range), the view will scroll to the newly
-     * selected date if it's not already visible.
-     *
-     * @return - whether we were able to set the date
-     */
-    public boolean selectDate(Date date) {
-        return selectDate(date, false);
+    private boolean selectDate(Date date) {
+        if (validateDate(date)) {
+            return doSelectDate(date, false);
+        }
+        return false;
     }
 
-    /**
-     * Select a new date.  Respects the {@link SelectionMode} this CalendarPickerView is configured
-     * with: if you are in {@link SelectionMode#SINGLE}, the previously selected date will be
-     * un-selected.  In {@link SelectionMode#MULTIPLE}, the new date will be added to the list of
-     * selected dates.
-     * <p>
-     * If the selection was made (selectable date, in range), the view will scroll to the newly
-     * selected date if it's not already visible.
-     *
-     * @return - whether we were able to set the date
-     */
-    public boolean selectDate(Date date, boolean smoothScroll) {
-        validateDate(date);
-
-        MonthCellWithMonthIndex monthCellWithMonthIndex = getMonthCellWithIndexByDate(date);
-        if (monthCellWithMonthIndex == null || !isDateSelectable(date)) {
-            return false;
-        }
-        boolean wasSelected = doSelectDate(date, monthCellWithMonthIndex.cell);
-        if (wasSelected) {
-            scrollToSelectedMonth(monthCellWithMonthIndex.monthIndex, smoothScroll);
-        }
-        return wasSelected;
+    private boolean validateDate(@NonNull Date date) {
+        return date.after(minCal.getTime()) && date.before(maxCal.getTime());
     }
 
-    private void validateDate(Date date) {
-        if (date == null) {
-            throw new IllegalArgumentException("Selected date must be non-null.");
-        }
-        if (date.before(minCal.getTime()) || date.after(maxCal.getTime())) {
-            throw new IllegalArgumentException(String.format(
-                    "SelectedDate must be between minDate and maxDate."
-                            + "%nminDate: %s%nmaxDate: %s%nselectedDate: %s", minCal.getTime(), maxCal.getTime(),
-                    date));
-        }
-    }
-
-    private boolean doSelectDate(Date date, MonthCellDescriptor cell) {
+    private boolean doSelectDate(Date date, boolean isValidate) {
         Calendar newlySelectedCal = Calendar.getInstance(locale);
         newlySelectedCal.setTime(date);
         // Sanitize input: clear out the hours/minutes/seconds/millis.
@@ -477,7 +371,9 @@ public class CalendarPickerView extends RecyclerView {
         }
 
         // Update the adapter.
-        validateAndUpdate();
+        if (isValidate) {
+            validateAndUpdate();
+        }
         return date != null;
     }
 
@@ -501,48 +397,6 @@ public class CalendarPickerView extends RecyclerView {
         validateAndUpdate();
     }
 
-    /**
-     * Hold a cell with a month-index.
-     */
-    private static class MonthCellWithMonthIndex {
-        MonthCellDescriptor cell;
-        int monthIndex;
-
-        MonthCellWithMonthIndex(MonthCellDescriptor cell, int monthIndex) {
-            this.cell = cell;
-            this.monthIndex = monthIndex;
-        }
-    }
-
-    /**
-     * Return cell and month-index (for scrolling) for a given Date.
-     */
-    private MonthCellWithMonthIndex getMonthCellWithIndexByDate(Date date) {
-        int index = 0;
-        Calendar searchCal = Calendar.getInstance(locale);
-        searchCal.setTime(date);
-        Calendar actCal = Calendar.getInstance(locale);
-
-        MonthDescriptor month;
-        for (int i = 0; i < totalMonth; i++) {
-            monthCounter.setTime(minCal.getTime());
-            monthCounter.add(MONTH, i);
-            month = new MonthDescriptor(monthCounter.get(MONTH), monthCounter.get(YEAR), monthNameFormat.format(monthCounter.getTime()));
-            if (sameMonth(searchCal, month)) {
-                for (List<MonthCellDescriptor> weekCells : getMonthCells(month, monthCounter)) {
-                    for (MonthCellDescriptor actCell : weekCells) {
-                        actCal.setTimeInMillis(actCell.getTime());
-                        if (sameDate(actCal, searchCal) && actCell.isSelectable()) {
-                            return new MonthCellWithMonthIndex(actCell, index);
-                        }
-                    }
-                    index++;
-                }
-            }
-        }
-        return null;
-    }
-
     private class MonthAdapter extends RecyclerView.Adapter<MonthViewHolder> {
 
         @Override
@@ -556,6 +410,7 @@ public class CalendarPickerView extends RecyclerView {
             return position;
         }
 
+        @NonNull
         @Override
         public MonthViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             MonthView monthView = MonthView.create(parent, LayoutInflater.from(parent.getContext()), weekdayNameFormat, listener, today,
@@ -664,12 +519,6 @@ public class CalendarPickerView extends RecyclerView {
         return cells;
     }
 
-    private boolean containsDate(List<Calendar> selectedCals, Date date) {
-        Calendar cal = Calendar.getInstance(locale);
-        cal.setTime(date);
-        return containsDate(selectedCals, cal);
-    }
-
     private boolean containsDate(List<Calendar> selectedCals, Calendar cal) {
         for (Calendar selectedCal : selectedCals) {
             if (sameDate(cal, selectedCal)) {
@@ -708,10 +557,6 @@ public class CalendarPickerView extends RecyclerView {
         final Date min = minCal.getTime();
         return (date.equals(min) || date.after(min)) // >= minCal
                 && date.before(maxCal.getTime()); // && < maxCal
-    }
-
-    private static boolean sameMonth(Calendar cal, MonthDescriptor month) {
-        return (cal.get(MONTH) == month.getMonth() && cal.get(YEAR) == month.getYear());
     }
 
     private boolean sameMonth(Calendar first, Calendar second) {
@@ -808,15 +653,5 @@ public class CalendarPickerView extends RecyclerView {
      */
     public interface CellClickInterceptor {
         boolean onCellClicked(Date date);
-    }
-
-    private class DefaultOnInvalidDateSelectedListener implements OnInvalidDateSelectedListener {
-        @Override
-        public void onInvalidDateSelected(Date date) {
-            String errMessage =
-                    getResources().getString(R.string.invalid_date, fullDateFormat.format(minCal.getTime()),
-                            fullDateFormat.format(maxCal.getTime()));
-            Toast.makeText(getContext(), errMessage, Toast.LENGTH_SHORT).show();
-        }
     }
 }

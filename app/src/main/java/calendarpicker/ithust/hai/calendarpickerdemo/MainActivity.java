@@ -14,7 +14,6 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
 import ithust.hai.calendarpicker.CalendarPickerView;
@@ -42,7 +41,8 @@ public class MainActivity extends AppCompatActivity {
         calendar = findViewById(R.id.calendar_view);
         calendar.init(new Date(), nextYear.getTime()) //
                 .inMode(SelectionMode.SINGLE) //
-                .withSelectedDate(new Date());
+                .withSelectedDate(new Date())
+                .show();
 
         initButtonListeners(nextYear, lastYear);
     }
@@ -64,7 +64,8 @@ public class MainActivity extends AppCompatActivity {
                 calendar.setCustomDayView(new DefaultDayViewAdapter());
                 calendar.init(new Date(), nextYear.getTime()) //
                         .inMode(SelectionMode.SINGLE) //
-                        .withSelectedDate(new Date());
+                        .withSelectedDate(new Date())
+                        .show();
             }
         });
 
@@ -82,7 +83,8 @@ public class MainActivity extends AppCompatActivity {
                 }
                 calendar.init(new Date(), nextYear.getTime()) //
                         .inMode(SelectionMode.MULTIPLE) //
-                        .withSelectedDates(dates);
+                        .withSelectedDates(dates)
+                        .show();
             }
         });
 
@@ -100,7 +102,8 @@ public class MainActivity extends AppCompatActivity {
                 dates.add(today.getTime());
                 calendar.init(new Date(), nextYear.getTime()) //
                         .inMode(SelectionMode.RANGE) //
-                        .withSelectedDates(dates);
+                        .withSelectedDates(dates)
+                        .show();
             }
         });
 
@@ -110,7 +113,8 @@ public class MainActivity extends AppCompatActivity {
                 String title = "I'm a dialog!";
                 showCalendarInDialog(title, R.layout.dialog);
                 dialogView.init(lastYear.getTime(), nextYear.getTime()) //
-                        .withSelectedDate(new Date());
+                        .withSelectedDate(new Date())
+                        .show();
             }
         });
 
@@ -122,17 +126,20 @@ public class MainActivity extends AppCompatActivity {
                 calendar.setCustomDayView(new SampleDayViewAdapter());
                 calendar.init(lastYear.getTime(), nextYear.getTime())
                         .inMode(SelectionMode.SINGLE)
-                        .withSelectedDate(new Date());
+                        .withSelectedDate(new Date())
+                        .show();
             }
         });
 
         findViewById(R.id.done_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                List<Date> getSelectedDates = calendar.getSelectedDates();
-                for (Date date : getSelectedDates) {
-                    Log.d("DuyNgao", date.toString());
-                }
+                Calendar today = Calendar.getInstance();
+                today.add(Calendar.DATE, 50);
+                ArrayList<Date> dates = new ArrayList<>();
+                dates.add(new Date());
+                dates.add(today.getTime());
+                calendar.newSelectedDate(dates);
             }
         });
     }
