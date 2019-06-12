@@ -10,5 +10,13 @@
     <attr name="tsquare_displayDayNamesHeaderRow" format="boolean"/>
     <attr name="tsquare_displayAlwaysDigitNumbers" format="boolean"/>
     <attr name="tsquare_headerTextColor" format="color"/>
+
+    <attr name="cpv_defaultDateSelected" format="reference"/>
+    <attr name="cpv_startingDateSelected" format="reference"/>
+    <attr name="cpv_endingDateSelected" format="reference"/>
+    <attr name="cpv_dateStartWeekSelected" format="reference"/>
+    <attr name="cpv_dateEndWeekSelected" format="reference"/>
+    <attr name="cpv_dateMiddleWeekSelected" format="reference"/>
+
   </declare-styleable>
 </resources>
