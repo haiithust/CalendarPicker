@@ -32,29 +32,29 @@ public class CalendarCellView extends FrameLayout {
         }
     }
 
-    public void setRangeState(byte rangeState) {
+    public void setRangeState(byte rangeState, StyleResourcesProvider resourcesProvider) {
         switch (rangeState) {
             case RangeState.NONE:
                 if (!isSelected()) {
                     setBackgroundColor(Color.WHITE);
                 } else {
-                    setBackgroundResource(R.drawable.calendar_date_picker_selected);
+                    setBackgroundResource(resourcesProvider.getDefaultDateSelected());
                 }
                 break;
             case RangeState.START_WEEK:
-                setBackgroundResource(R.drawable.calendar_date_picker_selected_start_week);
+                setBackgroundResource(resourcesProvider.getDateStartWeekSelected());
                 break;
             case RangeState.END_WEEK:
-                setBackgroundResource(R.drawable.calendar_date_picker_selected_end_week);
+                setBackgroundResource(resourcesProvider.getDateEndWeekSelected());
                 break;
             case RangeState.MIDDLE:
-                setBackgroundResource(R.drawable.calendar_date_picker_selected_middle);
+                setBackgroundResource(resourcesProvider.getDateMiddleWeekSelected());
                 break;
             case RangeState.FIRST:
-                setBackgroundResource(R.drawable.calendar_date_picker_selected_left);
+                setBackgroundResource(resourcesProvider.getStartingDateSelected());
                 break;
             case RangeState.LAST:
-                setBackgroundResource(R.drawable.calendar_date_picker_selected_right);
+                setBackgroundResource(resourcesProvider.getEndingDateSelected());
                 break;
         }
     }

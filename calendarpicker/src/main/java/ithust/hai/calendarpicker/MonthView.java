@@ -22,13 +22,18 @@ public class MonthView extends LinearLayout {
     private Listener listener;
     private Locale locale;
     private boolean alwaysDigitNumbers;
+    private StyleResourcesProvider styleResourcesProvider;
 
     public static MonthView create(ViewGroup parent, LayoutInflater inflater,
                                    DateFormat weekdayNameFormat, Listener listener, Calendar today,
                                    int dayBackgroundResId, int dayTextColorResId, int titleTextStyle,
                                    boolean displayDayNamesHeaderRowView, boolean showAlwaysDigitNumbers,
+                                   StyleResourcesProvider styleResourcesProvider,
                                    Locale locale, DayViewAdapter adapter) {
         final MonthView view = (MonthView) inflater.inflate(R.layout.calendar_view_month, parent, false);
+
+        // Set style resources provider
+        view.styleResourcesProvider = styleResourcesProvider;
 
         // Set the views
         view.title = new TextView(new ContextThemeWrapper(view.getContext(), titleTextStyle));
@@ -98,7 +103,7 @@ public class MonthView extends LinearLayout {
                         cellView.setClickable(!displayOnly);
                         cellView.setSelected(cell.isSelected());
 
-                        cellView.setRangeState(cell.getRangeState());
+                        cellView.setRangeState(cell.getRangeState(), styleResourcesProvider);
                         cellView.setToday(cell.isToday());
                         cellView.setTag(cell);
                     } else {
@@ -106,7 +111,7 @@ public class MonthView extends LinearLayout {
                         cellView.setClickable(false);
                         cellView.setSelected(false);
 
-                        cellView.setRangeState(cell.getRangeState());
+                        cellView.setRangeState(cell.getRangeState(), styleResourcesProvider);
                         cellView.setToday(false);
                         cellView.getDayOfMonthTextView().setText("");
                     }
