@@ -326,14 +326,10 @@ public class CalendarPickerView extends RecyclerView {
     }
 
     private boolean selectDate(Date date) {
-        if (validateDate(date)) {
+        if (betweenDates(date, minCal, maxCal)) {
             return doSelectDate(date, false);
         }
         return false;
-    }
-
-    private boolean validateDate(@NonNull Date date) {
-        return date.after(minCal.getTime()) && date.before(maxCal.getTime());
     }
 
     private boolean doSelectDate(Date date, boolean isValidate) {
