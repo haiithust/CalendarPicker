@@ -76,13 +76,18 @@ public class MainActivity extends AppCompatActivity {
 
                 calendar.setCustomDayView(new DefaultDayViewAdapter());
                 Calendar today = Calendar.getInstance();
-                ArrayList<Date> dates = new ArrayList<Date>();
+                ArrayList<Date> dates = new ArrayList<>();
                 for (int i = 0; i < 5; i++) {
                     today.add(Calendar.DAY_OF_MONTH, 3);
                     dates.add(today.getTime());
                 }
-                calendar.init(new Date(), nextYear.getTime()) //
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(dates.get(dates.size() - 1));
+                cal.add(Calendar.DATE, 1);
+
+                calendar.init(dates.get(0), cal.getTime()) //
                         .inMode(SelectionMode.MULTIPLE) //
+                        .withRestrictedDate(dates)
                         .withSelectedDates(dates)
                         .show();
             }

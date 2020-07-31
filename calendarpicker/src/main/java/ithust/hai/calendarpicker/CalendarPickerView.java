@@ -22,6 +22,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 
@@ -44,10 +45,11 @@ public class CalendarPickerView extends RecyclerView {
     private final CalendarPickerView.MonthAdapter adapter;
     private final MonthView.Listener listener = new CellClickedListener();
     private final List<Calendar> selectedCals = new ArrayList<>();
+    // with mode MULTIPLE if restricted calendar not empty it means only able to select inside list
+    private final HashSet<Long> restrictedCals = new HashSet<>();
     private Locale locale;
     private DateFormat monthNameFormat;
     private DateFormat weekdayNameFormat;
-    private DateFormat fullDateFormat;
     private Calendar minCal;
     private Calendar maxCal;
     private Calendar monthCounter;
@@ -98,7 +100,6 @@ public class CalendarPickerView extends RecyclerView {
         monthCounter = Calendar.getInstance(locale);
         weekdayNameFormat = new SimpleDateFormat(context.getString(R.string.day_name_format), locale);
         monthNameFormat = new SimpleDateFormat(context.getString(R.string.month_name_format), locale);
-        fullDateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM, locale);
 
         if (isInEditMode()) {
             Calendar nextYear = Calendar.getInstance(locale);
@@ -118,7 +119,6 @@ public class CalendarPickerView extends RecyclerView {
         monthCounter = Calendar.getInstance(locale);
         weekdayNameFormat = new SimpleDateFormat(getContext().getString(R.string.day_name_format), locale);
         monthNameFormat = new SimpleDateFormat(getContext().getString(R.string.month_name_format), locale);
-        fullDateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM, locale);
 
         this.selectionMode = SelectionMode.SINGLE;
         // Clear out any previously-selected dates/cells.
@@ -189,6 +189,19 @@ public class CalendarPickerView extends RecyclerView {
                 }
             }
             scrollToSelectedDates();
+            return this;
+        }
+
+        /**
+         * Should call after {@link @withSelectedDates}
+         */
+        public FluentInitializer withRestrictedDate(@NonNull List<Date> restrictedDates) {
+            for (Date date : restrictedDates) {
+                Calendar cal = Calendar.getInstance(locale);
+                cal.setTime(date);
+                setMidnight(cal);
+                restrictedCals.add(cal.getTimeInMillis());
+            }
             return this;
         }
 
@@ -350,11 +363,10 @@ public class CalendarPickerView extends RecyclerView {
                     // no need perform action when user select current
                     return false;
                 }
-
                 break;
 
             case SelectionMode.MULTIPLE:
-                date = applyMultiSelect(date, newlySelectedCal);
+                date = applyMultiSelect(newlySelectedCal);
                 break;
 
             case SelectionMode.SINGLE:
@@ -377,15 +389,19 @@ public class CalendarPickerView extends RecyclerView {
         selectedCals.clear();
     }
 
-    private Date applyMultiSelect(Date date, Calendar selectedCal) {
+    private Date applyMultiSelect(Calendar selectedCal) {
+        if (!restrictedCals.contains(selectedCal.getTimeInMillis())) {
+            return null;
+        }
+
         for (Calendar cal : selectedCals) {
             if (sameDate(cal, selectedCal)) {
                 selectedCals.remove(cal);
-                date = null;
-                break;
+                return null;
             }
         }
-        return date;
+
+        return selectedCal.getTime();
     }
 
     public void clearSelectedDates() {
@@ -464,7 +480,10 @@ public class CalendarPickerView extends RecyclerView {
                 boolean isCurrentMonth = cal.get(MONTH) == month.getMonth();
 
                 boolean isSelected = isCurrentMonth && containsDate(selectedCals, cal);
-                boolean isSelectable = isCurrentMonth && betweenDates(cal, minCal, maxCal) && isDateSelectable(cal.getTime());
+                boolean isSelectable = (selectionMode == SelectionMode.MULTIPLE && !restrictedCals.isEmpty())
+                        ? restrictedCals.contains(cal.getTimeInMillis())
+                        : (isCurrentMonth && betweenDates(cal, minCal, maxCal) && isDateSelectable(cal.getTime()));
+
                 boolean isToday = sameDate(cal, today);
 
                 byte rangeState = RangeState.NONE;
