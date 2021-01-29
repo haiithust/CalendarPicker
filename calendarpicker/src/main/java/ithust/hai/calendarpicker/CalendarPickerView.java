@@ -61,6 +61,7 @@ public class CalendarPickerView extends RecyclerView {
     private int titleTextStyle;
     private boolean displayDayNamesHeaderRow;
     private boolean displayAlwaysDigitNumbers;
+    private StyleResourcesProvider styleResourcesProvider;
 
     private OnDateSelectedListener dateListener;
     private DateSelectableFilter dateConfiguredListener;
@@ -87,6 +88,7 @@ public class CalendarPickerView extends RecyclerView {
                 a.getBoolean(R.styleable.CalendarPickerView_tsquare_displayDayNamesHeaderRow, true);
         displayAlwaysDigitNumbers =
                 a.getBoolean(R.styleable.CalendarPickerView_tsquare_displayAlwaysDigitNumbers, false);
+        styleResourcesProvider = StyleResourcesProvider.createFromAttributes(a);
         a.recycle();
 
         setLayoutManager(new LinearLayoutManager(getContext()));
@@ -427,7 +429,8 @@ public class CalendarPickerView extends RecyclerView {
         public MonthViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             MonthView monthView = MonthView.create(parent, LayoutInflater.from(parent.getContext()), weekdayNameFormat, listener, today,
                     dayBackgroundResId, dayTextColorResId, titleTextStyle,
-                    displayDayNamesHeaderRow, displayAlwaysDigitNumbers, locale, dayViewAdapter);
+                    displayDayNamesHeaderRow, displayAlwaysDigitNumbers,
+                    styleResourcesProvider, locale, dayViewAdapter);
             return new MonthViewHolder(monthView);
         }
 
