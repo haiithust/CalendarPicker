@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -47,6 +48,7 @@ public class CalendarPickerView extends RecyclerView {
     private final List<Calendar> selectedCals = new ArrayList<>();
     // with mode MULTIPLE if restricted calendar not empty it means only able to select inside list
     private final HashSet<Long> restrictedCals = new HashSet<>();
+    private final HashSet<Long> unSelectableCals = new HashSet<>();
     private Locale locale;
     private DateFormat monthNameFormat;
     private DateFormat weekdayNameFormat;
@@ -196,11 +198,22 @@ public class CalendarPickerView extends RecyclerView {
          * Should call after {@link @withSelectedDates}
          */
         public FluentInitializer withRestrictedDate(@NonNull List<Date> restrictedDates) {
+            Calendar cal = Calendar.getInstance(locale);
             for (Date date : restrictedDates) {
-                Calendar cal = Calendar.getInstance(locale);
                 cal.setTime(date);
                 setMidnight(cal);
                 restrictedCals.add(cal.getTimeInMillis());
+            }
+            return this;
+        }
+
+        public FluentInitializer withUnselectedDate(@NonNull List<Date> unselectedDate) {
+            Calendar cal = Calendar.getInstance(locale);
+            for (Date date : unselectedDate) {
+                cal.setTime(date);
+                setMidnight(cal);
+                selectDate(date);
+                unSelectableCals.add(cal.getTimeInMillis());
             }
             return this;
         }
@@ -233,6 +246,13 @@ public class CalendarPickerView extends RecyclerView {
         }
         validateAndUpdate();
         scrollToSelectedDates();
+    }
+
+    public void setSelectedDates(@NonNull List<Date> selectedDates) {
+        for (Date date : selectedDates) {
+            selectDate(date);
+        }
+        validateAndUpdate();
     }
 
     private void validateAndUpdate() {
@@ -315,6 +335,7 @@ public class CalendarPickerView extends RecyclerView {
     private class CellClickedListener implements MonthView.Listener {
         @Override
         public void handleClick(MonthCellDescriptor cell) {
+            if (unSelectableCals.contains(cell.getTime())) return;
             Date clickedDate = new Date(cell.getTime());
 
             if (cellClickInterceptor != null && cellClickInterceptor.onCellClicked(clickedDate)) {
@@ -389,6 +410,7 @@ public class CalendarPickerView extends RecyclerView {
         selectedCals.clear();
     }
 
+    @Nullable
     private Date applyMultiSelect(Calendar selectedCal) {
         if (!restrictedCals.contains(selectedCal.getTimeInMillis())) {
             return null;
