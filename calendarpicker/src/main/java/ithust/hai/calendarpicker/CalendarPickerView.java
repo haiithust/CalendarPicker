@@ -251,7 +251,20 @@ public class CalendarPickerView extends RecyclerView {
 
     public void setSelectedDates(@NonNull List<Date> selectedDates) {
         for (Date date : selectedDates) {
-            selectDate(date);
+            Calendar cal = Calendar.getInstance(locale);
+            cal.setTime(date);
+            if (!selectedCals.contains(cal)) {
+                selectedCals.add(cal);
+            }
+        }
+        validateAndUpdate();
+    }
+
+    public void setUnselectedDates(@NonNull List<Date> unselectedDates) {
+        for (Date date : unselectedDates) {
+            Calendar cal = Calendar.getInstance(locale);
+            cal.setTime(date);
+            selectedCals.remove(cal);
         }
         validateAndUpdate();
     }
