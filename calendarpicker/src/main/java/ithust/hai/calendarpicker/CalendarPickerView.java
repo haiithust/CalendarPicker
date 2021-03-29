@@ -269,6 +269,10 @@ public class CalendarPickerView extends RecyclerView {
         validateAndUpdate();
     }
 
+    public boolean isDateSelected() {
+        return !selectedCals.isEmpty();
+    }
+
     private void validateAndUpdate() {
         if (getAdapter() == null) {
             setAdapter(adapter);
