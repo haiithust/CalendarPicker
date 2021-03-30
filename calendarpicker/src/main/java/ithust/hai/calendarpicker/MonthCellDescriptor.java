@@ -10,13 +10,14 @@ class MonthCellDescriptor {
     private final long time;
     private final int value;
     private final boolean isCurrentMonth;
-    private boolean isSelected;
+    private final boolean isSelected;
     private final boolean isToday;
     private final boolean isSelectable;
+    private final boolean isActive;
     private byte rangeState;
 
     MonthCellDescriptor(long time, boolean currentMonth, boolean selectable, boolean selected,
-                        boolean today, int value, byte rangeState) {
+                        boolean today, int value, boolean isActive, byte rangeState) {
         this.time = time;
         isCurrentMonth = currentMonth;
         isSelectable = selectable;
@@ -24,6 +25,7 @@ class MonthCellDescriptor {
         isToday = today;
         this.value = value;
         this.rangeState = rangeState;
+        this.isActive = isActive;
     }
 
     public long getTime() {
@@ -42,8 +44,8 @@ class MonthCellDescriptor {
         return isSelected;
     }
 
-    public void setSelected(boolean selected) {
-        isSelected = selected;
+    public boolean isActive() {
+        return isActive;
     }
 
     public boolean isToday() {

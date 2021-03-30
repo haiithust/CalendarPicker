@@ -98,8 +98,9 @@ public class MonthView extends LinearLayout {
                         cellView.setClickable(!displayOnly);
                         cellView.setSelected(cell.isSelected());
 
+                        cellView.setActivated(cell.isActive());
                         cellView.setRangeState(cell.getRangeState());
-                        cellView.setToday(cell.isToday());
+                        cellView.setHighlightDate(cell.isToday() || cell.isSelected());
                         cellView.setTag(cell);
                     } else {
                         cellView.setEnabled(false);
@@ -107,7 +108,7 @@ public class MonthView extends LinearLayout {
                         cellView.setSelected(false);
 
                         cellView.setRangeState(cell.getRangeState());
-                        cellView.setToday(false);
+                        cellView.setHighlightDate(false);
                         cellView.getDayOfMonthTextView().setText("");
                     }
                 }

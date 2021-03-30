@@ -10,17 +10,17 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 public class CalendarCellView extends FrameLayout {
-    private boolean isToday = false;
+    private boolean isHighlight = false;
     private TextView dayOfMonthTextView;
 
     public CalendarCellView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public void setToday(boolean isToday) {
-        if (this.isToday != isToday) {
-            this.isToday = isToday;
-            if (isToday) {
+    public void setHighlightDate(boolean isHighlight) {
+        if (this.isHighlight != isHighlight) {
+            this.isHighlight = isHighlight;
+            if (isHighlight) {
                 if (dayOfMonthTextView != null) {
                     dayOfMonthTextView.setTypeface(null, Typeface.BOLD);
                 }
@@ -32,13 +32,23 @@ public class CalendarCellView extends FrameLayout {
         }
     }
 
+    @Override
+    public void setActivated(boolean activated) {
+        super.setActivated(activated);
+        dayOfMonthTextView.setActivated(activated);
+    }
+
     public void setRangeState(byte rangeState) {
         switch (rangeState) {
             case RangeState.NONE:
                 if (!isSelected()) {
                     setBackgroundColor(Color.WHITE);
                 } else {
-                    setBackgroundResource(R.drawable.calendar_date_picker_selected);
+                    if (isActivated()) {
+                        setBackgroundResource(R.drawable.calendar_date_picker_selected);
+                    } else {
+                        setBackgroundResource(R.drawable.calendar_date_picker_inactive);
+                    }
                 }
                 break;
             case RangeState.START_WEEK:

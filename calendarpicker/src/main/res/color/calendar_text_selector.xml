@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="@color/calendar_text_selected" android:state_activated="false" android:state_selected="true" />
     <item android:color="@color/calendar_text_selected" android:state_enabled="true" android:state_selected="true" />
     <item android:color="@color/calendar_text_inactive" android:state_enabled="false" />
     <item android:color="@color/calendar_text_normal" />

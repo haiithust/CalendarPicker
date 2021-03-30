@@ -213,9 +213,9 @@ public class CalendarPickerView extends RecyclerView {
             for (Date date : unselectedDate) {
                 cal.setTime(date);
                 setMidnight(cal);
-                selectDate(date);
                 unSelectableCals.add(cal.getTimeInMillis());
             }
+            setSelectedDates(unselectedDate);
             return this;
         }
 
@@ -520,8 +520,9 @@ public class CalendarPickerView extends RecyclerView {
                 boolean isCurrentMonth = cal.get(MONTH) == month.getMonth();
 
                 boolean isSelected = isCurrentMonth && containsDate(selectedCals, cal);
+                boolean isActive = selectionMode != SelectionMode.MULTIPLE || !unSelectableCals.contains(cal.getTimeInMillis());
                 boolean isSelectable = (selectionMode == SelectionMode.MULTIPLE && !restrictedCals.isEmpty())
-                        ? restrictedCals.contains(cal.getTimeInMillis())
+                        ? restrictedCals.contains(cal.getTimeInMillis()) && isActive
                         : (isCurrentMonth && betweenDates(cal, minCal, maxCal) && isDateSelectable(cal.getTime()));
 
                 boolean isToday = sameDate(cal, today);
@@ -550,13 +551,13 @@ public class CalendarPickerView extends RecyclerView {
                     }
                 }
 
-                weekCells.add(new MonthCellDescriptor(cal.getTimeInMillis(), isCurrentMonth, isSelectable, isSelected, isToday, isCurrentMonth ? cal.get(DAY_OF_MONTH) : 0, rangeState));
+                weekCells.add(new MonthCellDescriptor(cal.getTimeInMillis(), isCurrentMonth, isSelectable, isSelected, isToday, isCurrentMonth ? cal.get(DAY_OF_MONTH) : 0, isActive, rangeState));
                 if (isCurrentMonth && selectionMode != SelectionMode.MULTIPLE) {
                     if (cal.get(DAY_OF_MONTH) == cal.getActualMaximum(DAY_OF_MONTH) && (rangeState == RangeState.FIRST
                             || rangeState == RangeState.MIDDLE || rangeState == RangeState.START_WEEK)) {
                         // if first day of month is last selected day, should mark all next item
                         for (c = c + 1; c < 7; c++) {
-                            weekCells.add(new MonthCellDescriptor(cal.getTimeInMillis(), false, false, false, isToday, 0, c == 6 ? RangeState.END_WEEK : RangeState.MIDDLE));
+                            weekCells.add(new MonthCellDescriptor(cal.getTimeInMillis(), false, false, false, isToday, 0, isActive, c == 6 ? RangeState.END_WEEK : RangeState.MIDDLE));
                             cal.add(DATE, 1);
                         }
                         break;
