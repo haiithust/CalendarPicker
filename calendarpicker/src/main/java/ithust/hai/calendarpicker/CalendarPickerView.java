@@ -353,7 +353,7 @@ public class CalendarPickerView extends RecyclerView {
     private class CellClickedListener implements MonthView.Listener {
         @Override
         public void handleClick(MonthCellDescriptor cell) {
-            if (unSelectableCals.contains(cell.getTime())) return;
+            if (unSelectableCals.contains(cell.getTime()) || !isEnabled()) return;
             Date clickedDate = new Date(cell.getTime());
 
             if (cellClickInterceptor != null && cellClickInterceptor.onCellClicked(clickedDate)) {
